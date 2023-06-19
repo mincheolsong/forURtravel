@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.forurtravel.travelReview.model.mapper.TravelReviewMapper">
+	<resultMap type="travelReviewDto" id="travelReviewWrite">
+		<result column="travel_review_no" property="travelReviewNo"/> 
+		<result column="travel_review_title" property="title"/>
+		<result column="start_day" property="startDay"/>
+		<result column="end_day" property="endDay"/>
+		<result column="review" property="review"/>
+		<result column="created_time" property="createdTime"/>
+		<result column="modified_time" property="modifiedTime"/>
+		<result column="attraction_no" property="attractionNo"/>
+		<result column="user_no" property="userNo"/>
+		<result column="money" property="money"/>
+	</resultMap>
+	
+	<resultMap type="travelReviewResultDto" id="travelReviewResult">
+		<result column="travel_review_no" property="travelReviewNo"/>
+		<result column="travel_review_title" property="title"/>
+		<result column="start_day" property="startDay"/>
+		<result column="end_day" property="endDay"/>
+		<result column="review" property="review"/>
+		<result column="travel_review_created_time" property="createdTime"/>
+		<result column="travel_review_modified_time" property="modifiedTime"/>
+		<result column="money" property="money"/>
+		<association property="attraction" javaType="attractionDto">
+			<result column="attraction_no" property="contentId"/>
+			<result column="attraction_title" property="title"/>
+			<result column="first_image" property="image"/>
+			<result column="latitude" property="latitude"/>
+			<result column="longitude" property="longitude"/>
+			<result column="addr" property="addr"/>
+			<result column="description" property="description"/>
+		</association>
+		<association property="user" javaType="userProfileDto">
+			<result column="user_no" property="userNo"/>
+			<result column="user_id" property="userId"/>
+			<result column="user_name" property="userName"/>
+			<result column="email" property="email"/>
+			<result column="authority" property="authority"/>
+			<result column="created_time" property="createdTime"/>
+			<result column="modified_time" property="modifiedTime"/>
+			<result column="ofile" property="ofile"/>
+			<result column="sfolder" property="sfolder"/>
+			<result column="sfile" property="sfile"/>
+		</association>
+	</resultMap>
+	
+	<resultMap type="hotplaceDto" id = "hotplaceResult">
+		<result column="review_count" property="reviewCount"/>
+		<result column="attraction_no" property="attractionNo"/>
+		<result column="title" property="title"/>
+		<result column="addr" property="addr"/>
+		<result column="first_image" property="image"/>
+	</resultMap>
+	
+	<resultMap type="travelReviewWordsDto" id = "wordcloud">
+		<result column="review_count" property="count"/>
+		<result column="title" property="word"/>
+	</resultMap>
+	
+	<insert id="write">
+		insert into travel_review values(null,#{title},#{startDay},#{endDay},#{review},now(),null,#{attractionNo},#{userNo},#{money})
+	</insert>
+	
+	<select id="detail" parameterType="int" resultMap="travelReviewResult">
+		select travel_review_no,travel_review.title as travel_review_title,start_day,end_day,review,travel_review.created_time as travel_review_created_time,travel_review.modified_time as travel_review_modified_time,money,
+				attraction_no,attraction_info.title as attraction_title,first_image,latitude,longitude,addr,description,
+				user.user_no,user_id,user_name,ofile,sfolder,sfile
+				from travel_review
+				join attraction_info on attraction_info.content_id = travel_review.attraction_no
+				join user using(user_no)
+				where travel_review_no = #{travelReviewNo};
+	</select>
+	
+	<select id="listAttraction" parameterType="int" resultMap="travelReviewResult">
+		select travel_review_no,travel_review.title as travel_review_title,start_day,end_day,review,travel_review.created_time as travel_review_created_time,travel_review.modified_time as travel_review_modified_time,money,
+				attraction_no,
+				user.user_no,user_id,user_name,ofile,sfolder,sfile
+				from travel_review
+				join attraction_info on attraction_info.content_id = travel_review.attraction_no
+				join user using(user_no)
+				where attraction_no = #{attractionNo};
+	</select>
+	
+	<select id="listUser" parameterType="int" resultMap="travelReviewResult">
+		select travel_review_no,travel_review.title as travel_review_title,start_day,end_day,review,travel_review.created_time as travel_review_created_time,travel_review.modified_time as travel_review_modified_time,money,
+				attraction_no,attraction_info.title as attraction_title,first_image,latitude,longitude,addr,description,
+				user.user_no,user_id,user_name,ofile,sfolder,sfile
+				from travel_review
+				join attraction_info on attraction_info.content_id = travel_review.attraction_no
+				join user using(user_no)
+				where user_no = #{userNo};
+	</select>
+	<select id="random" resultMap="travelReviewResult">
+		select travel_review_no,travel_review.title as travel_review_title,start_day,end_day,review,travel_review.created_time as travel_review_created_time,travel_review.modified_time as travel_review_modified_time,money,
+				attraction_no,attraction_info.title as attraction_title,first_image,latitude,longitude,addr,description,
+				user.user_no,user_id,user_name,ofile,sfolder,sfile
+				from travel_review
+				join attraction_info on attraction_info.content_id = travel_review.attraction_no
+				join user using(user_no) order by rand() limit 10;
+	</select>
+	
+	<select id="hotplace" resultMap="hotplaceResult">
+		select count(*) as review_count,attraction_no,attraction_info.title,addr,first_image as image from travel_review join attraction_info on attraction_no = content_id group by attraction_no order by review_count desc limit 10;
+	</select>
+	
+	<select id="wordcloud" resultMap="wordcloud">
+		select count(*) as review_count,attraction_info.title from travel_review join attraction_info on attraction_no = content_id group by attraction_no order by review_count desc limit 1000;
+	</select>
+</mapper>

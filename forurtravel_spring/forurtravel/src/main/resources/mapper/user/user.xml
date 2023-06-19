@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.forurtravel.user.model.mapper.UserMapper">
+	<resultMap type="userDto" id="userResult">
+		<result column="user_no" property="userNo"/>
+		<result column="user_id" property="userId"/>
+		<result column="user_name" property="userName"/>
+		<result column="email" property="email"/>
+		<result column="authority" property="authority"/>
+		<result column="created_time" property="createdTime"/>
+		<result column="modified_time" property="modifiedTime"/>
+		<result column="ofile" property="ofile"/>
+		<result column="sfolder" property="sfolder"/>
+		<result column="sfile" property="sfile"/>
+	</resultMap>
+
+	<select id="idCheck" parameterType="String" resultType="int">
+		select count(user_id)
+		from user
+		where user_id = #{userId}
+	</select>
+
+	<insert id="joinUser" parameterType="userDto">
+		insert into user (user_name, user_id, password, email,authority, created_time,salt,ofile,sfolder,sfile)
+		values (#{userName}, #{userId}, #{password}, #{email},'user', now(),#{salt},#{ofile},#{sfolder},#{sfile})
+	</insert>
+	
+	<update id="saveRefreshToken" parameterType="map">
+		update user
+		set refresh_token = #{refreshToken}
+		where user_no = #{userNo}
+	</update>
+	<update id="findPw" parameterType="userDto">
+		update user
+		set password = #{password}
+		where user_id = #{userId}
+	</update>
+	
+	<update id="deleteRefreshToken" parameterType="int">
+		update user
+		set refresh_token = null
+		where user_no = #{userNo}
+	</update>
+	
+	<select id="getRefreshToken" parameterType="int" resultType="string">
+		select refresh_token
+		from user
+		where user_no = #{userNo}
+	</select>
+	
+	<select id="loginUser" parameterType="userDto" resultMap="userResult">
+		select *
+		from user
+		where user_id = #{userId} and password = #{password}
+	</select>
+	
+	<select id="getSalt" parameterType="String" resultType="String">
+		select salt from user where user_id = #{userId}
+	</select>
+	
+	<select id="getUser" parameterType="string" resultMap="userResult">
+		select user_no,user_id, user_name, email,authority, created_time,modified_time,ofile,sfolder,sfile
+		from user
+		where user_id = #{userId}
+	</select>
+	
+	<select id="getUserByNo" parameterType="int" resultMap="userResult">
+		select user_no,user_id, user_name, email,authority, created_time,modified_time,ofile,sfolder,sfile
+		from user
+		where user_no = #{userNo}
+	</select>
+	
+	<update id="updateUser" parameterType="int">
+		update user
+		<trim prefix="set" suffixOverrides=",">
+			<if test="userName != null">user_name = #{userName},</if>
+			<if test="password != null">password = #{password},</if>
+			<if test="email != null">email = #{email},</if>
+			<if test="ofile != null">ofile = #{ofile},</if>
+			<if test="sfolder != null">sfolder = #{sfolder},</if>
+			<if test="sfile != null">sfile = #{sfile},</if>
+			modified_time = now()
+		</trim>
+		where user_no = #{userNo}
+	</update>
+	
+	<delete id="deleteUser" parameterType="int">
+		delete from user
+		where user_no = #{userNo}
+	</delete>
+
+	<select id="searchUser" parameterType="String" resultMap="userResult">
+		select user_no,user_id, user_name, email,authority, created_time,modified_time,ofile,sfolder,sfile
+		from user
+		where user_id like concat('%',#{userId},'%')
+		order by created_time
+	</select>
+</mapper>

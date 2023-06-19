@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="<%= BASE_URL %>4UrTravelIcon.svg" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        height: 100%;
+      }
+
+      /* 아래의 모든 코드는 영역::코드로 사용 */
+      html::-webkit-scrollbar {
+        width: 0.5rem;
+        /* 스크롤바의 너비 */
+      }
+
+      html::-webkit-scrollbar-thumb {
+        background-image: linear-gradient(180deg, #d0368a 0%, #708ad4 99%);
+        box-shadow: inset 0.1rem 0.1rem 0.2rem 0 rgba(#fff, 0.5);
+        border-radius: 5rem;
+      }
+
+      html::-webkit-scrollbar-track {
+        background: #fff;
+        /*스크롤바 뒷 배경 색상*/
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>
+      <strong
+        >We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without
+        JavaScript enabled. Please enable it to continue.</strong
+      >
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

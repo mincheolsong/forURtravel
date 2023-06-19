@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.forurtravel.boardcomment.model.mapper.BoardcommentMapper">
+
+	<resultMap type="boardcommentDto" id="boardcomment">
+		<result column="comment_no" property="commentNo"/>
+		<result column="board_no" property="boardNo"/>
+		<result column="user_no" property="userNo"/>
+		<result column="content" property="content"/>
+		<result column="boardcomment_created_time" property="createdTime"/>
+		<result column="boardcomment_modified_time" property="modifiedTime"/>
+		<association property="user" javaType="userDto">
+			<result column="user_no" property="userNo"/>
+			<result column="user_name" property="userName"/>
+			<result column="ofile" property="ofile"/>
+			<result column="sfolder" property="sfolder"/>
+			<result column="sfile" property="sfile"/>
+		</association>
+	</resultMap>
+	
+	
+	
+	<insert id="write" parameterType="boardcommentDto">
+		insert into boardcomment (comment_no, board_no, user_no,content)
+		values(#{commentNo},#{boardNo},#{userNo},#{content})
+	</insert>
+	
+	<select id="getList" parameterType="int" resultMap="boardcomment">
+		select comment_no,board_no,content,boardcomment.modified_time as boardcomment_modified_time,boardcomment.created_time as boardcomment_created_time,user.user_no,user.user_name,user.sfolder,user.ofile,user.sfile
+		from boardcomment
+		join user using(user_no)
+		where board_no = #{boardNo}
+		order by comment_no desc
+
+	</select>
+	
+	<select id="getTotalCount" parameterType="int" resultType="int">
+		select count(*) from boardcomment where board_no = #{boardNo}
+	</select>
+	
+	<update id="update" parameterType="boardcommentDto">
+		update boardcomment
+		set content=#{content},modified_time=now()
+		where comment_no=#{commentNo}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from boardcomment
+		where comment_no=#{commentNo}
+	</delete>
+	
+</mapper>

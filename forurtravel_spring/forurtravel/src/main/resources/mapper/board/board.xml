@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.forurtravel.board.model.mapper.BoardMapper">
+
+	<resultMap type="boardDto" id="board">
+		<result column="board_no" property="boardNo"/>
+		<result column="board_subject" property="subject"/>
+		<result column="board_content" property="content"/>
+		<result column="hit" property="hit"/>
+		<result column="user_no" property="userNo"/>
+		<result column="board_modified_time" property="modifiedTime"/>
+		<result column="board_created_time" property="createdTime"/>
+		<result column="ofile" property="ofile"/>
+		<result column="sfolder" property="sfolder"/>
+		<result column="sfile" property="sfile"/>
+		<result column="board_type" property="boardType"/>
+		
+	</resultMap>
+
+	<resultMap type="boardDto" id="boardAndUser">
+		<result column="board_no" property="boardNo"/>
+		<result column="board_subject" property="subject"/>
+		<result column="board_content" property="content"/>
+		<result column="hit" property="hit"/>
+		<result column="board_modified_time" property="modifiedTime"/>
+		<result column="board_created_time" property="createdTime"/>
+		<result column="board_ofile" property="ofile"/>
+		<result column="board_sfolder" property="sfolder"/>
+		<result column="board_sfile" property="sfile"/>
+		<result column="board_type" property="boardType"/>
+		<association property="user" javaType="userDto">
+			<result column="user_no" property="userNo"/>
+			<result column="user_name" property="userName"/>
+			<result column="user_ofile" property="ofile"/>
+			<result column="user_sfolder" property="sfolder"/>
+			<result column="user_sfile" property="sfile"/>
+		</association>
+	</resultMap>
+	
+	
+	
+	<insert id="write" parameterType="boardDto">
+		insert into board (board_subject, board_content, user_no,ofile,sfolder,sfile,board_type)
+		values(#{subject},#{content},#{userNo},#{ofile},#{sfolder},#{sfile},#{boardType})
+	</insert>
+	
+	<select id="getBoard" parameterType="int" resultMap="boardAndUser">
+		select board_no,board_subject, board_content,hit,board.modified_time as board_modified_time,board.created_time as board_created_time,board.ofile as board_ofile,board.sfolder as board_sfolder,board.sfile as board_sfile,user.user_no,user.user_name,user.ofile as user_ofile,user.sfile as user_sfile,user.sfolder as user_sfolder
+		from board
+		join user using(user_no)
+		where board_no=#{boardNo}
+	</select>
+	
+	<select id="getList" parameterType="searchDto" resultMap="boardAndUser">
+		select board_no,board_subject, board_content,hit,board.modified_time as board_modified_time,board.created_time as board_created_time,board.ofile as board_ofile,board.sfolder as board_sfolder,board.sfile as board_sfile,user.user_no,user.user_name,user.ofile as user_ofile,user.sfile as user_sfile,user.sfolder as user_sfolder
+		from board
+		join user using(user_no)
+
+		<if test="word != null and word != ''">
+			<if test="key == 0">
+				where board_subject like concat('%',#{word},'%')and board_type=#{boardType}
+			</if>
+			<if test="key == 1">
+				where board_content like concat('%',#{word},'%')and board_type=#{boardType}
+			</if>
+			<if test="key == 2">
+				where (board_content like concat('%',#{word},'%') or board_subject like concat('%',#{word},'%') )and board_type=#{boardType}
+			</if>
+		</if>
+		<if test="word == null or word == ''">
+			where board_type = #{boardType}
+		</if>
+		order by board_no desc
+		limit #{curPage}, #{listCount}
+	</select>
+	
+	<select id="getTotalCount" parameterType="searchDto" resultType="int">
+		select count(*) from board
+		<if test="word != null and word != ''">
+			<if test="key == 0">
+				where board_subject like concat('%',#{word},'%')and board_type=#{boardType}
+			</if>
+			<if test="key == 1">
+				where board_content like concat('%',#{word},'%')and board_type=#{boardType}
+			</if>
+			<if test="key == 2">
+				where (board_content like concat('%',#{word},'%') or board_subject like concat('%',#{word},'%') )and board_type=#{boardType}
+			</if>
+		</if>
+		<if test="word == null or word == ''">
+			where board_type = #{boardType}
+		</if>
+	</select>
+	
+	<update id="update" parameterType="boardDto">
+		update board
+		set board_subject=#{subject}, board_content=#{content}, modified_time=now(),ofile=#{ofile},sfolder=#{sfolder},sfile=#{sfile}
+		where board_no=#{boardNo}
+	</update>
+	<update id="updateHit" parameterType="int">
+		update board
+		set hit = hit+1
+		where board_no=#{boardNo}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from board
+		where board_no=#{boardNo}
+	</delete>
+	
+</mapper>
