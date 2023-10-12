@@ -1,8 +1,9 @@
 # 여행객들을 위한 웹서비스
 
-<iframe src="https://play-tv.kakao.com/embed/player/cliplink/438946006?service=daum_tistory" width="860" height="484" frameborder="0" allowfullscreen="true"></iframe>
+시연영상  
+https://play-tv.kakao.com/embed/player/cliplink/438946006?service=daum_tistory
 
-시연영상
+
 
 ## 제작동기
 
