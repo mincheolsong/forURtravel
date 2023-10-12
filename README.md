@@ -1,7 +1,7 @@
 # 여행객들을 위한 웹서비스
 
 시연영상  
-https://play-tv.kakao.com/embed/player/cliplink/438946006?service=daum_tistory
+https://play-tv.kakao.com/embed/player/cliplink/438946006?service=daum_tistory 
 
 
 
